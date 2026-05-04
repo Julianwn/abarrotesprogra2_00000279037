@@ -3,6 +3,9 @@
  */
 package objetosdominio;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 /**
  * Representa un movimiento dentro del sistema.
  * Sirve como superclase para los movimientos de productos empacados y a granel.
@@ -11,8 +14,11 @@ package objetosdominio;
  */
 public class Movimiento {
 
-    private String clave, fecha;
+    private String clave;
+    private LocalDate fecha;
     private boolean procesado;
+    
+    private static final DateTimeFormatter formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private static int contador = 0;
 
@@ -21,7 +27,7 @@ public class Movimiento {
      */
     public Movimiento() {
         this.clave = "";
-        this.fecha = "";
+        this.fecha = null;
         this.procesado = false;
     }
 
@@ -39,7 +45,7 @@ public class Movimiento {
      */
     public Movimiento(String clave) {
         this.clave = clave;
-        this.fecha = "";
+        this.fecha = null;
         this.procesado = false;
     }
 
@@ -56,16 +62,16 @@ public class Movimiento {
         return clave;
     }
     
-    public String getFecha() {
+    public LocalDate getFecha() {
         return fecha;
     }
 
     public void setFecha(String fecha) {
 
         if (validarFecha(fecha)) {
-            this.fecha = fecha;
+            this.fecha = LocalDate.parse(fecha, formatoFecha);
         } else {
-            System.out.println("Error Fecha invalida...");
+            System.out.println("Error formato de fecha invalido...");
         }
     }
 
