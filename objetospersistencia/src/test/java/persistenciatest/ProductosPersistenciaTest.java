@@ -12,23 +12,23 @@ public class ProductosPersistenciaTest {
     void agregarProductoCorrecto() throws Exception {
         ProductosPersistencia repo = new ProductosPersistencia();
 
-        Producto p = new Producto("AT001", "Arroz", 'E', "KG");
+        Producto p = new Producto("GR001", "Arroz", 'E', "KG");
 
         repo.agregarProducto(p);
 
-        assertNotNull(repo.buscarProducto("AT001"));
+        assertNotNull(repo.buscarProducto("GR001"));
     }
 
     @Test
     void agregarProductoDuplicado() throws Exception {
         ProductosPersistencia repo = new ProductosPersistencia();
 
-        Producto p = new Producto("AT001", "Arroz", 'E', "KG");
+        Producto p = new Producto("GR001", "Arroz", 'E', "KG");
 
         repo.agregarProducto(p);
 
         assertThrows(PersistenciaException.class, () -> {
-            repo.agregarProducto(p);
+            repo.agregarProducto(new Producto("GR001", "Otro", 'E', "KG"));
         });
     }
 
@@ -36,7 +36,7 @@ public class ProductosPersistenciaTest {
     void claveInvalida() {
         ProductosPersistencia repo = new ProductosPersistencia();
 
-        Producto p = new Producto("A1001", "Arroz", 'E', "KG");
+        Producto p = new Producto("XX001", "Arroz", 'E', "KG");
 
         assertThrows(PersistenciaException.class, () -> {
             repo.agregarProducto(p);
@@ -44,10 +44,10 @@ public class ProductosPersistenciaTest {
     }
 
     @Test
-    void unidadInvalida() {
+    void nombreInvalido() {
         ProductosPersistencia repo = new ProductosPersistencia();
 
-        Producto p = new Producto("AT001", "Arroz", 'E', "LT");
+        Producto p = new Producto("GR001", "", 'E', "KG");
 
         assertThrows(PersistenciaException.class, () -> {
             repo.agregarProducto(p);
@@ -58,7 +58,7 @@ public class ProductosPersistenciaTest {
     void tipoInvalido() {
         ProductosPersistencia repo = new ProductosPersistencia();
 
-        Producto p = new Producto("AT001", "Arroz", 'X', "KG");
+        Producto p = new Producto("GR001", "Arroz", 'X', "KG");
 
         assertThrows(PersistenciaException.class, () -> {
             repo.agregarProducto(p);
@@ -66,15 +66,15 @@ public class ProductosPersistenciaTest {
     }
 
     @Test
-    void eliminarProducto() throws Exception {
+    void eliminarProductoCorrecto() throws Exception {
         ProductosPersistencia repo = new ProductosPersistencia();
 
-        Producto p = new Producto("AT001", "Arroz", 'E', "KG");
+        Producto p = new Producto("GR001", "Arroz", 'E', "KG");
 
         repo.agregarProducto(p);
-        repo.eliminarProducto("AT001");
+        repo.eliminarProducto("GR001");
 
-        assertNull(repo.buscarProducto("AT001"));
+        assertNull(repo.buscarProducto("GR001"));
     }
 
     @Test
@@ -82,32 +82,61 @@ public class ProductosPersistenciaTest {
         ProductosPersistencia repo = new ProductosPersistencia();
 
         assertThrows(PersistenciaException.class, () -> {
-            repo.eliminarProducto("AT001");
+            repo.eliminarProducto("GR001");
         });
     }
 
     @Test
-    void actualizarProducto() throws Exception {
+    void actualizarProductoCorrecto() throws Exception {
         ProductosPersistencia repo = new ProductosPersistencia();
 
-        Producto p1 = new Producto("AT001", "Arroz", 'E', "KG");
-        Producto p2 = new Producto("AT001", "Arroz Integral", 'E', "KG");
+        Producto original = new Producto("GR001", "Arroz", 'E', "KG");
+        Producto actualizado = new Producto("GR001", "Arroz Integral", 'E', "KG");
 
-        repo.agregarProducto(p1);
-        repo.actualizarProducto(p2);
+        repo.agregarProducto(original);
+        repo.actualizarProducto(actualizado);
 
-        assertEquals("Arroz Integral", repo.buscarProducto("AT001").getNombre());
+        assertEquals("Arroz Integral", repo.buscarProducto("GR001").getNombre());
     }
 
     @Test
-    void consultarConFiltros() throws Exception {
+    void actualizarProductoNoExiste() {
         ProductosPersistencia repo = new ProductosPersistencia();
 
-        repo.agregarProducto(new Producto("AT001", "Arroz", 'E', "KG"));
-        repo.agregarProducto(new Producto("LT001", "Leche", 'G', "L"));
+        Producto p = new Producto("GR001", "Arroz", 'E', "KG");
+
+        assertThrows(PersistenciaException.class, () -> {
+            repo.actualizarProducto(p);
+        });
+    }
+
+    @Test
+    void consultarSinFiltros() throws Exception {
+        ProductosPersistencia repo = new ProductosPersistencia();
+
+        repo.agregarProducto(new Producto("GR001", "Arroz", 'E', "KG"));
+        repo.agregarProducto(new Producto("EM001", "Leche", 'G', "L"));
+
+        assertEquals(2, repo.consultarProductos(null, null).size());
+    }
+
+    @Test
+    void consultarPorTipo() throws Exception {
+        ProductosPersistencia repo = new ProductosPersistencia();
+
+        repo.agregarProducto(new Producto("GR001", "Arroz", 'E', "KG"));
+        repo.agregarProducto(new Producto("EM001", "Leche", 'G', "L"));
 
         assertEquals(1, repo.consultarProductos("E", null).size());
+    }
+
+    @Test
+    void consultarPorUnidad() throws Exception {
+        ProductosPersistencia repo = new ProductosPersistencia();
+
+        repo.agregarProducto(new Producto("GR001", "Arroz", 'E', "KG"));
+        repo.agregarProducto(new Producto("EM001", "Leche", 'G', "L"));
+
         assertEquals(1, repo.consultarProductos(null, "L").size());
-        assertEquals(2, repo.consultarProductos(null, null).size());
     }
 }

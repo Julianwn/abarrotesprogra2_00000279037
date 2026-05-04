@@ -2,10 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
+  
   <groupId>com.julian_n</groupId>
   <artifactId>abarrotesprogra2_00000279037</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.2</version>
   <packaging>pom</packaging>
 
   <properties>
@@ -20,6 +20,16 @@
       <url>https://maven.pkg.github.com/Julianwn/abarrotesprogra2_00000279037</url>
     </repository>
   </distributionManagement>
+  
+  <dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>com.julian_n</groupId>
+            <artifactId>abarrotesprogra2_00000279037</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+  </dependencyManagement>
   
   <modules>
     <module>objetosdominio</module>

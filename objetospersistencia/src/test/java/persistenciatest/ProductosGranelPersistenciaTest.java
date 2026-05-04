@@ -10,23 +10,23 @@ import exceptions.PersistenciaException;
 public class ProductosGranelPersistenciaTest {
 
     @Test
-    void agregarCorrecto() throws Exception {
+    void agregarProductoCorrecto() throws Exception {
         ProductosGranelPersistencia repo = new ProductosGranelPersistencia();
 
-        Producto p = new Producto("AT001", "Arroz", 'E', "KG");
-        ProductoGranel pg = new ProductoGranel(p, 10);
+        Producto base = new Producto("EM001", "Leche", 'G', "L");
+        ProductoGranel pg = new ProductoGranel(base, 10f);
 
         repo.agregarProducto(pg);
 
-        assertNotNull(repo.buscarProducto("AT001"));
+        assertNotNull(repo.buscarProducto("GR001"));
     }
 
     @Test
-    void cantidadInvalida() {
+    void cantidadInvalidaNoSeAgrega() {
         ProductosGranelPersistencia repo = new ProductosGranelPersistencia();
 
-        Producto p = new Producto("AT001", "Arroz", 'E', "KG");
-        ProductoGranel pg = new ProductoGranel(p, 0);
+        Producto base = new Producto("EM001", "Leche", 'G', "L");
+        ProductoGranel pg = new ProductoGranel(base, 0.0f);
 
         assertThrows(PersistenciaException.class, () -> {
             repo.agregarProducto(pg);
@@ -37,36 +37,73 @@ public class ProductosGranelPersistenciaTest {
     void productoDuplicado() throws Exception {
         ProductosGranelPersistencia repo = new ProductosGranelPersistencia();
 
-        Producto p = new Producto("AT001", "Arroz", 'E', "KG");
+        Producto base = new Producto("EM001", "Leche", 'G', "L");
 
-        repo.agregarProducto(new ProductoGranel(p, 10));
+        repo.agregarProducto(new ProductoGranel(base, 10f));
 
         assertThrows(PersistenciaException.class, () -> {
-            repo.agregarProducto(new ProductoGranel(p, 5));
+            repo.agregarProducto(new ProductoGranel(base, 5f));
         });
     }
 
     @Test
-    void actualizarProducto() throws Exception {
+    void actualizarProductoCorrecto() throws Exception {
         ProductosGranelPersistencia repo = new ProductosGranelPersistencia();
 
-        Producto p = new Producto("AT001", "Arroz", 'E', "KG");
+        Producto base = new Producto("EM001", "Leche", 'G', "L");
 
-        repo.agregarProducto(new ProductoGranel(p, 10));
-        repo.actualizarProducto(new ProductoGranel(p, 20));
+        repo.agregarProducto(new ProductoGranel(base, 10f));
+        repo.actualizarProducto(new ProductoGranel(base, 20f));
 
-        assertEquals(20, repo.buscarProducto("AT001").getCantidad());
+        assertEquals(20f, repo.buscarProducto("GR001").getCantidad());
     }
 
     @Test
-    void eliminarProducto() throws Exception {
+    void actualizarProductoCantidadInvalida() throws Exception {
         ProductosGranelPersistencia repo = new ProductosGranelPersistencia();
 
-        Producto p = new Producto("AT001", "Arroz", 'E', "KG");
+        Producto base = new Producto("EM001", "Leche", 'G', "L");
 
-        repo.agregarProducto(new ProductoGranel(p, 10));
-        repo.eliminarProducto("AT001");
+        repo.agregarProducto(new ProductoGranel(base, 10f));
 
-        assertNull(repo.buscarProducto("AT001"));
+        ProductoGranel pg = new ProductoGranel(base, 0.0f);
+
+        assertThrows(PersistenciaException.class, () -> {
+            repo.actualizarProducto(pg);
+        });
+    }
+
+    @Test
+    void eliminarProductoCorrecto() throws Exception {
+        ProductosGranelPersistencia repo = new ProductosGranelPersistencia();
+
+        Producto base = new Producto("EM001", "Leche", 'G', "L");
+
+        repo.agregarProducto(new ProductoGranel(base, 10f));
+        repo.eliminarProducto("GR001");
+
+        assertNull(repo.buscarProducto("GR001"));
+    }
+
+    @Test
+    void eliminarProductoNoExiste() {
+        ProductosGranelPersistencia repo = new ProductosGranelPersistencia();
+
+        assertThrows(PersistenciaException.class, () -> {
+            repo.eliminarProducto("GR001");
+        });
+    }
+
+    @Test
+    void consultarInventario() throws Exception {
+        ProductosGranelPersistencia repo = new ProductosGranelPersistencia();
+
+        Producto base1 = new Producto("EM001", "Leche", 'G', "L");
+        Producto base2 = new Producto("GR002", "Arroz", 'E', "KG");
+
+        repo.agregarProducto(new ProductoGranel(base1, 10f));
+        repo.agregarProducto(new ProductoGranel(base2, 5f));
+
+        assertEquals(2, repo.consultarInventario().size());
     }
 }

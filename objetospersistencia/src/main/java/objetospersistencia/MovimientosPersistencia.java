@@ -33,6 +33,9 @@ public class MovimientosPersistencia {
     private void validarMovimiento(Movimiento m) throws PersistenciaException {
         LocalDate hoy = LocalDate.now();
 
+        if (m.getFecha() == null) {
+            throw new PersistenciaException("Fecha inválida");
+        }
         if (m.getFecha().isAfter(hoy)) {
             throw new PersistenciaException("Fecha futura inválida");
         }

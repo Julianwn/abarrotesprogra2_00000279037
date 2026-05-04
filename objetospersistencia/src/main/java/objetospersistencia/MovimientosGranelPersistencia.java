@@ -20,7 +20,7 @@ public class MovimientosGranelPersistencia {
 
         for (MovimientoGranel m : movimientos) {
             if (m.getProducto().getClave().equals(movimiento.getProducto().getClave())
-                    && m.getFecha().equals(movimiento.getFecha())) {
+                && m.getFecha().isEqual(movimiento.getFecha())) {
                 throw new PersistenciaException("Movimiento duplicado en el día");
             }
         }
@@ -39,6 +39,9 @@ public class MovimientosGranelPersistencia {
     private void validarMovimiento(MovimientoGranel m) throws PersistenciaException {
         LocalDate hoy = LocalDate.now();
         
+        if (m == null) {
+            throw new PersistenciaException("Movimiento null");
+        }
         if (m.getFecha().isAfter(hoy)) {
             throw new PersistenciaException("Fecha futura inválida");
         }

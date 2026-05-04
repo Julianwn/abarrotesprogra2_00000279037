@@ -3,62 +3,107 @@ package persistenciatest;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import objetospersistencia.MovimientosGranelPersistencia;
-import objetosdominio.MovimientoGranel;
 import objetosdominio.Producto;
 import objetosdominio.ProductoGranel;
+import objetosdominio.MovimientoGranel;
 import exceptions.PersistenciaException;
 
 public class MovimientosGranelPersistenciaTest {
 
+    private String hoy() {
+        return LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    }
+
+    private String ayer() {
+        return LocalDate.now().minusDays(1)
+                .format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    }
+
+    private String futuro() {
+        return LocalDate.now().plusDays(1)
+                .format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    }
+
+    private String fueraDeMes() {
+        return LocalDate.now().minusMonths(1)
+                .format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    }
+
+    private ProductoGranel crearProductoGranel() {
+        Producto base = new Producto("EM001", "Leche", 'G', "L");
+        return new ProductoGranel(base, 10f);
+    }
+
     @Test
-    void compraCorrecta() throws Exception {
+    void registrarCompraCorrecta() throws Exception {
         MovimientosGranelPersistencia repo = new MovimientosGranelPersistencia();
 
-        ProductoGranel p = new ProductoGranel(new Producto("AT001", "Arroz", 'G', "KR"), 1.5f);
-        MovimientoGranel m = new MovimientoGranel("04/05/2026", true, p);
+        MovimientoGranel m = new MovimientoGranel(ayer(), true, crearProductoGranel());
 
         repo.registrarCompra(m);
 
         assertEquals(1, repo.consultarCompras().size());
+        assertFalse(repo.consultarCompras().get(0).isProcesado());
     }
 
     @Test
-    void noDuplicadoMismoDia() throws Exception {
+    void registrarVentaCorrecta() throws Exception {
         MovimientosGranelPersistencia repo = new MovimientosGranelPersistencia();
 
-        ProductoGranel p = new ProductoGranel(new Producto("AT001", "Arroz", 'G', "KR"), 1.5f);
+        MovimientoGranel m = new MovimientoGranel(ayer(), true, crearProductoGranel());
 
-        repo.registrarCompra(new MovimientoGranel("04/05/2026", true, p));
+        repo.registrarVenta(m);
+
+        assertEquals(1, repo.consultarCompras().size()); // misma lista en tu implementación
+        assertFalse(repo.consultarCompras().get(0).isProcesado());
+    }
+
+    @Test
+    void noPermitirDuplicadoMismoProductoMismoDia() throws Exception {
+        MovimientosGranelPersistencia repo = new MovimientosGranelPersistencia();
+
+        ProductoGranel pg = crearProductoGranel();
+
+        repo.registrarCompra(new MovimientoGranel(hoy(), true, pg));
 
         assertThrows(PersistenciaException.class, () -> {
-            repo.registrarCompra(new MovimientoGranel("04/05/2026", true, p));
+            repo.registrarCompra(new MovimientoGranel(hoy(), true, pg));
         });
     }
 
     @Test
-    void ventaCorrecta() throws Exception {
+    void fechaFuturaNoPermitida() {
         MovimientosGranelPersistencia repo = new MovimientosGranelPersistencia();
 
-        ProductoGranel p = new ProductoGranel(new Producto("AT001", "Arroz", 'G', "KR"), 1.5f);
-        MovimientoGranel m = new MovimientoGranel("04/05/2026", true, p);
+        MovimientoGranel m = new MovimientoGranel(futuro(), true, crearProductoGranel());
 
-        repo.registrarVenta(m);
-
-        assertEquals(1, repo.consultarCompras().size());
+        assertThrows(PersistenciaException.class, () -> {
+            repo.registrarCompra(m);
+        });
     }
 
     @Test
-    void consultarPeriodo() throws Exception {
+    void fueraDeMesNoPermitido() {
         MovimientosGranelPersistencia repo = new MovimientosGranelPersistencia();
 
-        ProductoGranel p = new ProductoGranel(new Producto("AT001", "Arroz", 'G', "KR"), 1.5f);
+        MovimientoGranel m = new MovimientoGranel(fueraDeMes(), true, crearProductoGranel());
 
-        repo.registrarVenta(new MovimientoGranel("04/05/2026", true, p));
+        assertThrows(PersistenciaException.class, () -> {
+            repo.registrarCompra(m);
+        });
+    }
+
+    @Test
+    void consultarPorPeriodo() throws Exception {
+        MovimientosGranelPersistencia repo = new MovimientosGranelPersistencia();
+
+        repo.registrarVenta(new MovimientoGranel(ayer(), true, crearProductoGranel()));
 
         assertEquals(1, repo.consultarPorPeriodo(
-                LocalDate.now().minusDays(1),
-                LocalDate.now().plusDays(1)
+                LocalDate.now().minusDays(2),
+                LocalDate.now()
         ).size());
     }
 }

@@ -15,7 +15,7 @@ public class ProductosGranelPersistencia {
     private final List<ProductoGranel> inventario = new ArrayList<>();
 
     public void agregarProducto(ProductoGranel producto) throws PersistenciaException {
-        if (producto.getCantidad() <= 0) {
+        if (producto.getCantidad() <= 0.01f) {
             throw new PersistenciaException("Cantidad inválida");
         }
 

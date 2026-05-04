@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.julian_n</groupId>
         <artifactId>abarrotesprogra2_00000279037</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.2</version>
     </parent>
     <artifactId>objetospersistencia</artifactId>
     <packaging>jar</packaging>

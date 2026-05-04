@@ -19,7 +19,7 @@ public class ProductosPersistencia {
             throw new PersistenciaException("Producto nulo");
         }
 
-        if (producto.getClave() == null || !producto.getClave().matches("[A-Z]{2}\\d{3}")) {
+        if (producto.getClave() == null || !producto.getClave().matches("(GR|EM)\\d{3}")) {
             throw new PersistenciaException("Clave inválida");
         }
 
@@ -35,7 +35,7 @@ public class ProductosPersistencia {
             throw new PersistenciaException("Unidad inválida");
         }
         
-        if (!String.valueOf(producto.getTipo()).matches("E|G")) {
+        if (producto.getTipo() != 'E' && producto.getTipo() != 'G') {
             throw new PersistenciaException("Tipo inválido");
         }
 
