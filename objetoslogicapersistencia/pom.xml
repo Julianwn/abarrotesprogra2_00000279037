@@ -6,16 +6,15 @@
         <artifactId>abarrotesprogra2_00000279037</artifactId>
         <version>1.0.2</version>
     </parent>
-    <artifactId>objetosdominio</artifactId>
+    <artifactId>objetoslogicapersistencia</artifactId>
     <packaging>jar</packaging>
     <properties>
-        <exec.mainClass>objetosdominio.Objetosdominio</exec.mainClass>
-        <maven.compiler.release>24</maven.compiler.release>
+        <exec.mainClass>objetoslogicapersistencia.Objetoslogicapersistencia</exec.mainClass>
     </properties>
     <dependencies>
         <dependency>
             <groupId>com.julian_n</groupId>
-            <artifactId>objetosservicio</artifactId>
+            <artifactId>objetosfachada</artifactId>
             <version>1.0.2</version>
         </dependency>
     </dependencies>

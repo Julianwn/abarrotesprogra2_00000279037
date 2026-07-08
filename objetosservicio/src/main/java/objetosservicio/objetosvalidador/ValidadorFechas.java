@@ -1,7 +1,7 @@
 /*
  * Clase de servicio que proporciona métodos para validar fechas y horarios.
  */
-package objetosservicio;
+package objetosservicio.objetosvalidador;
 
 //** @author Julian Daniel Ramirez Garcia
 

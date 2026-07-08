@@ -6,95 +6,72 @@ package objetospersistencia;
 import java.util.ArrayList;
 import java.util.List;
 import objetosdominio.Producto;
-import exceptions.PersistenciaException;
+import objetosdominio.TipoProducto;
+import objetosdominio.TipoUnidad;
 
 //** @author Julian Daniel Ramirez Garcia
 
-public class ProductosPersistencia {
+public class ProductosPersistencia<T extends Producto> {
 
-    private final List<Producto> listaProductos = new ArrayList<>();
+    private final List<T> catalogo;
+    
+    public ProductosPersistencia() {
+        catalogo = new ArrayList<>();
+    }
 
-    public void agregarProducto(Producto producto) throws PersistenciaException {
-        if (producto == null) {
-            throw new PersistenciaException("Producto nulo");
+    //** metodos de consulta unica ---------------------------------------------
+    public T consultarProducto(String clave) throws PersistenciaException {
+        for (T producto : catalogo) {
+            if (producto.getClave().equals(clave)) {
+                return producto;
+            }
         }
-
-        if (producto.getClave() == null || !producto.getClave().matches("(GR|EM)\\d{3}")) {
-            throw new PersistenciaException("Clave inválida");
-        }
-
-        if (buscarProducto(producto.getClave()) != null) {
-            throw new PersistenciaException("Producto duplicado");
-        }
-
-        if (producto.getNombre() == null || producto.getNombre().isEmpty()) {
-            throw new PersistenciaException("Nombre requerido");
-        }
-
-        if (!producto.getUnidad().matches("KG|L|PZ")) {
-            throw new PersistenciaException("Unidad inválida");
-        }
+        throw new PersistenciaException("La clave no coincide con ningun producto");
+    }
+    
+    //** metodos de consulta a toda la lista -----------------------------------
+    public T[] consultarProductos(T[] a) {
+        return this.catalogo.toArray(a);
+    }
+    
+    public Object[] consultarProductos() {
+        return this.catalogo.toArray();
+    }
+    
+    //** metodos para consulta filtrada ----------------------------------------
+    public T[] consultarProductos(TipoProducto tipo, TipoUnidad unidad) {
+        List<T> productos = new ArrayList<>();
         
-        if (producto.getTipo() != 'E' && producto.getTipo() != 'G') {
-            throw new PersistenciaException("Tipo inválido");
-        }
-
-        listaProductos.add(producto);
-    }
-
-    public Producto buscarProducto(String clave) {
-        for (Producto p : listaProductos) {
-            if (p.getClave().equals(clave)) {
-                return p;
+        for (T producto : catalogo) {
+            if (tipo == producto.getTipo() && producto.getUnidad().equals(unidad)) {
+                productos.add(producto);
             }
         }
-        return null;
+        return (T[]) productos.toArray(Producto[]::new);
     }
-
-    public void actualizarProducto(Producto producto) throws PersistenciaException {
-        Producto existente = buscarProducto(producto.getClave());
-
-        if (existente == null) {
-            throw new PersistenciaException("Producto no existe");
+    
+    //** metodos para registro unico -------------------------------------------
+    public void agregarProducto(T producto) throws PersistenciaException {
+        catalogo.add(producto);
+    }
+    
+    /** metodos de actualizacion unica -----------------------------------------
+    public void actualizarProducto(String clave, T producto) throws PersistenciaException {
+        consultarProducto(clave).actualizar(producto);
+    }
+     */
+    
+    //** metodos de eliminacion unica ------------------------------------------
+    public void eliminarProducto(T producto) throws PersistenciaException {
+        catalogo.remove(producto);
+    }
+    
+    //** metodos de apoyo ------------------------------------------------------
+    private boolean buscarProducto(String clave) throws PersistenciaException {
+        for (T producto : catalogo) {
+            if (producto.getClave().equals(clave)) return true;
         }
-
-        eliminarProducto(producto.getClave());
-        agregarProducto(producto);
+        return false;
     }
-
-    public void eliminarProducto(String clave) throws PersistenciaException {
-        Producto p = buscarProducto(clave);
-
-        if (p == null) {
-            throw new PersistenciaException("Producto no encontrado");
-        }
-
-        listaProductos.remove(p);
-    }
-
-    public List<Producto> consultarProductos(String tipo, String unidad) {
-        List<Producto> resultado = new ArrayList<>();
-
-        for (Producto p : listaProductos) {
-            boolean coincide = true;
-
-            if (tipo != null && !String.valueOf(p.getTipo()).equals(tipo)) {
-                coincide = false;
-            }
-
-            if (unidad != null && !p.getUnidad().equals(unidad)) {
-                coincide = false;
-            }
-
-            if (coincide) {
-                resultado.add(p);
-            }
-        }
-
-        return resultado;
-    }
-
-    public List<Producto> getListaProductos() {
-        return listaProductos;
-    }
+    
 }

@@ -12,12 +12,12 @@
         <dependency>
             <groupId>com.julian_n</groupId>
             <artifactId>objetosdominio</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.2</version>
         </dependency>
         <dependency>
             <groupId>com.julian_n</groupId>
             <artifactId>objetosservicio</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

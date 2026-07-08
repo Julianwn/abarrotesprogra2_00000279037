@@ -1,7 +1,7 @@
 /*
  * Clase de utilidad que proporciona métodos para validar cadenas de texto.
  */
-package objetosservicio;
+package objetosservicio.objetosvalidador;
 
 //** @author Julian Daniel Ramirez Garcia
 

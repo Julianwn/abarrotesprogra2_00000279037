@@ -9,73 +9,72 @@ package objetosdominio;
  * 
  * @author Julian Daniel Ramirez Garcia
  */
-public class ProductoEmpacado extends Producto {
+public class ProductoEmpacado extends Producto<ProductoEmpacado> {
 
     private int cantidad;
 
     /**
-     * Constructor por defecto.
+     * Constructor que recibe todos sus atributos.
+     * @param clave
+     * @param nombre
+     * @param cantidad
      */
-    public ProductoEmpacado() {
-        super();
-        this.cantidad = 0;
-    }
-
-    /**
-     * Constructor que recibe un producto base y la cantidad.
-     */
-    public ProductoEmpacado(Producto p, int cantidad) {
-
-        super(iniciarClaveEM(p.getClave()), p.getNombre(), p.getTipo(), p.getUnidad());
+    public ProductoEmpacado(String clave, String nombre, int cantidad) {
+        super(clave, nombre, TipoProducto.EM, TipoUnidad.PZ);
         setCantidad(cantidad);
     }
-
+    
     /**
-     * Constructor que recibe un producto base.
+     * Constructor copia que recibe un producto empacado base.
      */
-    public ProductoEmpacado(Producto p) {
-
-        super(iniciarClaveEM(p.getClave()), p.getNombre(), p.getTipo(), p.getUnidad());
-        this.cantidad = 0;
-    }
-
-    /**
-     * Genera la clave EM a partir de otra clave.
-     */
-    public static String iniciarClaveEM(String clave) {
-        return "EM" + clave.substring(2);
-    }
-
-    /**
-     * Sobrescribe la validación de clave para productos empacados.
-     */
-    @Override
-    public boolean validarClave(String clave) {
-
-        return clave != null && !clave.equals("") && clave.matches("EM[0-9]{3}");
+    private ProductoEmpacado(ProductoEmpacado producto) {
+        super(producto.getClave(), producto.getNombre(), producto.getTipo(), producto.getUnidad());
+        this.cantidad = producto.getCantidad();
     }
 
     public int getCantidad() {
         return cantidad;
     }
 
-    public void setCantidad(int cantidad) {
-
+    public final void setCantidad(int cantidad) {
         if (cantidad >= 1) {
-            this.cantidad = cantidad;
+            if (cantidad <= 5000) {
+                this.cantidad = cantidad;
+            } else {
+                throw new IllegalArgumentException("Cantidad excedente (>5000)");
+            }
         } else {
-            System.out.println("Error Cantidad insuficiente...");
+            throw new IllegalArgumentException("Cantidad insuficiente (<1)");
         }
+    }
+    
+    public void agregarCantidad(int cantidad) {
+        setCantidad(this.cantidad + cantidad);
+    }
+    
+    public void restarCantidad(int cantidad) {
+        setCantidad(this.cantidad - cantidad);
+    }
+    
+    @Override
+    public void actualizar(ProductoEmpacado producto) {
+        setNombre(producto.getNombre());
+        setCantidad(producto.getCantidad());
+    }
+    
+    @Override
+    public ProductoEmpacado copiar() {
+        return new ProductoEmpacado(this);
     }
 
     @Override
     public String toString() {
-        return "ProductoEmpacado("
-                + "clave: " + clave
-                + ", nombre: " + nombre
-                + ", tipo: " + tipo
-                + ", unidad: " + unidad
-                + ", cantidad: " + cantidad
-                + ")";
+        return "ProductoEmpacado["
+                + "Clave: " + getClave()
+                + ", Nombre: " + getNombre()
+                + ", Tipo: " + getTipo().toString()
+                + ", Unidad: " + getUnidad().toString()
+                + ", Cantidad: " + cantidad
+                + "]";
     }
 }

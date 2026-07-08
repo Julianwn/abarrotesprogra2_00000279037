@@ -1,7 +1,7 @@
 /*
  * Clase abstracta que define la estructura base para la generación y validación de códigos.
  */
-package objetosservicio;
+package objetosservicio.objetosgenerador;
 
 //** @author Julian Daniel Ramirez Garcia
 

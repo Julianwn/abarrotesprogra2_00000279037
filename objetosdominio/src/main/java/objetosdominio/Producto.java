@@ -4,91 +4,70 @@
 package objetosdominio;
 
 import java.util.Objects;
+import objetosservicio.objetosvalidador.ValidadorStrings;
 
 /**
  * Representa un producto genérico dentro del sistema de abarrotes.
  * Esta clase sirve como superclase para los diferentes tipos de productos.
  * 
  * @author Julian Daniel Ramirez Garcia
+ * @param <T>
  */
-public class Producto {
+public class Producto<T extends Producto> {
 
-    protected String clave, nombre;
-    protected char tipo;
-    protected String unidad;
-
-    /**
-     * Constructor por defecto.
-     * Inicializa todos los atributos con valores vacíos.
-     */
-    public Producto() {
-        this.clave = "";
-        this.nombre = "";
-        this.tipo = '\0';
-        this.unidad = "";
-    }
+    private String clave;
+    private String nombre;
+    private TipoProducto tipo;
+    private TipoUnidad unidad;
 
     /**
      * Constructor completo.
      * Utiliza siempre los métodos de validación.
+     * @param clave
+     * @param nombre
+     * @param tipo
+     * @param unidad
      */
-    public Producto(String clave, String nombre, char tipo, String unidad) {
-        setClave(clave);
-        setNombre(nombre);
-        setTipo(tipo);
-        setUnidad(unidad);
-    }
-
-    /**
-     * Constructor que recibe solo la clave.
-     */
-    public Producto(String clave) {
-
-        if (validarClave(clave)) {
-            this.clave = clave;
+    public Producto(String clave, String nombre, TipoProducto tipo, TipoUnidad unidad) {
+        this.tipo = tipo;
+        if (validarClave(clave)) this.clave = clave;
+        if (!ValidadorStrings.estaVacio(nombre)) {
+            this.nombre = nombre;
         } else {
-            System.out.println("Error Clave invalida...");
-            this.clave = "";
+            throw new NullPointerException("Nombre vacio");
         }
-
-        this.nombre = "";
-        this.tipo = '\0';
-        this.unidad = "";
+        if (validarUnidad(unidad)) this.unidad = unidad;
     }
-
+    
     /**
      * Constructor copia.
      */
-    public Producto(Producto p) {
-        this.clave = p.clave;
-        this.nombre = p.nombre;
-        this.tipo = p.tipo;
-        this.unidad = p.unidad;
-    }
-
-    public String getClave() {
-        return clave;
-    }
-
-    /**
-     * Asigna la clave del producto.
-     * Este método es final para evitar romper la integridad del objeto.
-     */
-    public final void setClave(String clave) {
-
-        if (validarClave(clave)) {
-            this.clave = clave;
-        } else {
-            System.out.println("Error Clave invalida...");
-        }
+    private Producto(Producto producto) {
+        this.clave = producto.clave;
+        this.nombre = producto.nombre;
+        this.tipo = producto.tipo;
+        this.unidad = producto.unidad;
     }
 
     /**
      * Valida la clave del producto.
-     * Formato permitido: GR000 o EM000
+     * Formato permitido: GR0 o EM0
      */
-    public boolean validarClave(String clave) {
-        return clave != null && !clave.equals("") && clave.matches("(GR|EM)[0-9]{3}");
+    private boolean validarClave(String clave) {
+        if (ValidadorStrings.estaVacio(clave)) throw new NullPointerException("Clave invalida (null)");
+        if (clave.startsWith(tipo.toString())) {
+            if (clave.matches(tipo.toString() + "-[0-9]+")) {
+                return true;
+            } else {
+                throw new IllegalArgumentException("Formato de clave invalido (EM-0 o GR-0)");
+            }
+        } else {
+            throw new IllegalArgumentException("La clave del producto no corresponde con el tipo de producto");
+        }
+    }
+    
+    public String getClave() {
+        return clave;
     }
 
     public String getNombre() {
@@ -96,52 +75,59 @@ public class Producto {
     }
 
     public void setNombre(String nombre) {
-
-        if (validarNombre(nombre)) {
+        if (!ValidadorStrings.estaVacio(nombre)) {
             this.nombre = nombre;
         } else {
-            System.out.println("Error Nombre vacio...");
+            throw new NullPointerException("Nombre vacio");
         }
+        
     }
 
-    public boolean validarNombre(String nombre) {
-        return nombre != null && !nombre.equals("");
-    }
-
-    public char getTipo() {
+    public TipoProducto getTipo() {
         return tipo;
     }
 
-    public void setTipo(char tipo) {
+    public void setTipo(TipoProducto tipo) {
+        this.tipo = tipo;
+    }
 
-        if (validarTipo(tipo)) {
-            this.tipo = tipo;
-        } else {
-            System.out.println("Error Tipo invalido...");
+    private boolean validarUnidad(TipoUnidad unidad) {
+        switch (tipo) {
+            case EM -> {
+                if (unidad == TipoUnidad.PZ) {
+                    return true;
+                } else {
+                    throw new IllegalArgumentException("Tipo de unidad invalido para producto " + tipo.toString() + " (PZ)");
+                }
+            }
+            case GR -> {
+                if (unidad != TipoUnidad.PZ) {
+                    return true;
+                } else {
+                    throw new IllegalArgumentException("Tipo de unidad invalido para producto " + tipo.toString() + " (KG, g, L)");
+                }
+            }
         }
+        return false;
     }
-
-    public boolean validarTipo(char tipo) {
-        return tipo != '\0' && String.valueOf(tipo).matches("[EG]");
-    }
-
-    public String getUnidad() {
+    
+    public TipoUnidad getUnidad() {
         return unidad;
     }
 
-    public void setUnidad(String unidad) {
-
-        if (validarUnidad(unidad)) {
-            this.unidad = unidad;
-        } else {
-            System.out.println("Error Unidad invalida...");
-        }
+    public void setUnidad(TipoUnidad unidad) {
+        if (validarUnidad(unidad)) this.unidad = unidad;
     }
 
-    public boolean validarUnidad(String unidad) {
-        return unidad != null && !unidad.equals("") && unidad.matches("(KG|L|g|PZ)");
+    public void actualizar(T producto) {
+        setNombre(producto.getNombre());
+        setUnidad(producto.getUnidad());
     }
-
+    
+    public Producto copiar() {
+        return new Producto(this);
+    }
+    
     @Override
     public int hashCode() {
         return Objects.hashCode(this.clave);
@@ -165,11 +151,11 @@ public class Producto {
 
     @Override
     public String toString() {
-        return "Producto("
-                + "clave: " + clave
-                + ", nombre: " + nombre
-                + ", tipo: " + tipo
-                + ", unidad: " + unidad
-                + ")";
+        return "Producto["
+                + "Clave: " + clave
+                + ", Nombre: " + nombre
+                + ", Tipo: " + tipo.toString()
+                + ", Unidad: " + unidad.toString()
+                + "]";
     }
 }

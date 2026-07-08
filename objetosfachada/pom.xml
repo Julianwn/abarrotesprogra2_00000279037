@@ -6,27 +6,31 @@
         <artifactId>abarrotesprogra2_00000279037</artifactId>
         <version>1.0.2</version>
     </parent>
-    <artifactId>pruebas_main</artifactId>
+    <artifactId>objetosfachada</artifactId>
     <packaging>jar</packaging>
+    <properties>
+        <exec.mainClass>objetosfachada.Objetosfachada</exec.mainClass>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>com.julian_n</groupId>
             <artifactId>objetosdominio</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.2</version>
         </dependency>
         <dependency>
             <groupId>com.julian_n</groupId>
             <artifactId>objetosservicio</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.2</version>
         </dependency>
         <dependency>
             <groupId>com.julian_n</groupId>
             <artifactId>objetospersistencia</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.julian_n</groupId>
+            <artifactId>objetoslogicapersistencia</artifactId>
+            <version>1.0.2</version>
         </dependency>
     </dependencies>
-    <properties>
-        <exec.mainClass>pruebas.Pruebas_main</exec.mainClass>
-        <maven.compiler.release>24</maven.compiler.release>
-    </properties>
 </project>

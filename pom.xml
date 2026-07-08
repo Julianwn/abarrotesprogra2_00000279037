@@ -35,7 +35,8 @@
     <module>objetosdominio</module>
     <module>objetosservicio</module>
     <module>objetospersistencia</module>
-    <module>pruebas_main</module>
+    <module>objetosfachada</module>
+    <module>objetoslogicapersistencia</module>
   </modules>
   <name>abarrotesprogra2_00000279037</name>
 </project>

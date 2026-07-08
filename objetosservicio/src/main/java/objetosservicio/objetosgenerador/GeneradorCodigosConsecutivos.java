@@ -1,7 +1,7 @@
 /*
  * Generador de códigos consecutivos con prefijo.
  */
-package objetosservicio;
+package objetosservicio.objetosgenerador;
 
 //** @author Julian Daniel Ramirez Garcia
 
@@ -43,7 +43,7 @@ public class GeneradorCodigosConsecutivos extends GeneradorCodigos {
      */
     @Override
     public boolean tieneFormatoValido(String codigo) {
-        return codigo.matches(getPrefijo() + "-\\d+");
+        return codigo.matches(getPrefijo() + "-[0-9]+");
     }
     
     /**
@@ -53,7 +53,7 @@ public class GeneradorCodigosConsecutivos extends GeneradorCodigos {
      */
     @Override
     public String generarCodigo() {
-        return this.getPrefijo() + "-" + this.incrementarConsecutivo();
+        return getPrefijo() + "-" + incrementarConsecutivo();
     }
     
     /**

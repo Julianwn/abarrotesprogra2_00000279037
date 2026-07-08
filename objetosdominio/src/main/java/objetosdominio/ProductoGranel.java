@@ -9,70 +9,100 @@ package objetosdominio;
  * 
  * @author Julian Daniel Ramirez Garcia
  */
-public class ProductoGranel extends Producto {
+public class ProductoGranel extends Producto<ProductoGranel> {
 
     private float cantidad;
-
+    
     /**
-     * Constructor por defecto.
+     * Constructor que recibe todos sus atributos.
+     * @param clave
+     * @param nombre
+     * @param unidad
+     * @param cantidad
      */
-    public ProductoGranel() {
-        super();
-        this.cantidad = 0f;
-    }
-
-    /**
-     * Constructor que recibe un producto base y la cantidad.
-     */
-    public ProductoGranel(Producto p, float cantidad) {
-        super(iniciarClaveGR(p.getClave()), p.getNombre(), p.getTipo(), p.getUnidad());
+    public ProductoGranel(String clave, String nombre, TipoUnidad unidad, float cantidad) {
+        super(clave, nombre, TipoProducto.GR, validarUnidad(unidad));
         setCantidad(cantidad);
     }
-
+    
     /**
-     * Constructor que recibe un producto base.
+     * Constructor copia que recibe un producto granel base.
      */
-    public ProductoGranel(Producto p) {
-        super(iniciarClaveGR(p.getClave()), p.getNombre(), p.getTipo(), p.getUnidad());
-        this.cantidad = 0f;
+    private ProductoGranel(ProductoGranel producto) {
+        super(producto.getClave(), producto.getNombre(), producto.getTipo(), producto.getUnidad());
+        this.cantidad = producto.getCantidad();
     }
-
-    /**
-     * Genera la clave GR a partir de otra clave.
-     */
-    public static String iniciarClaveGR(String clave) {
-        return "GR" + clave.substring(2);
+    
+    private static TipoUnidad validarUnidad(TipoUnidad unidad) {
+        if (unidad != TipoUnidad.PZ) {
+            return unidad;
+        } else {
+            throw new IllegalArgumentException("Tipo unidad invalido para producto granel (KG, g, L)");
+        }
     }
-
-    /**
-     * Sobrescribe la validación de clave para productos a granel.
-     */
-    @Override
-    public boolean validarClave(String clave) {
-        return clave != null && !clave.equals("") && clave.matches("GR[0-9]{3}");
-    }
-
+    
     public float getCantidad() {
         return cantidad;
     }
 
-    public void setCantidad(float cantidad) {
-
-        if (cantidad > 0.01f) {
-            this.cantidad = cantidad;
+    public final void setCantidad(float cantidad) {
+        if (cantidad >= 0.01f) {
+            switch (getUnidad()) {
+                case KG -> {
+                    if (cantidad <= 1500f) {
+                        this.cantidad = cantidad;
+                    } else {
+                        throw new IllegalArgumentException("Cantidad excedente (1,500.00kg)");
+                    }
+                }
+                case g -> {
+                    if (cantidad <= 1500000f) {
+                        this.cantidad = cantidad;
+                    } else {
+                        throw new IllegalArgumentException("Cantidad excedente (1,500,000.00g");
+                    }
+                }
+                case L -> {
+                    if (cantidad <= 3000f) {
+                        this.cantidad = cantidad;
+                    } else {
+                        throw new IllegalArgumentException("Cantidad excedente (3,000.00L");
+                    }
+                }
+            }
         } else {
-            System.out.println("Error Cantidad insuficiente...");
+            throw new IllegalArgumentException("Cantidad insuficiente (<0.01)");
         }
+    }
+    
+    public void agregarCantidad(float cantidad) {
+        setCantidad(this.cantidad + cantidad);
+    }
+    
+    public void restarCantidad(float cantidad) {
+        setCantidad(this.cantidad - cantidad);
     }
 
     @Override
+    public void actualizar(ProductoGranel producto) {
+        setNombre(producto.getNombre());
+        setUnidad(producto.getUnidad());
+        setCantidad(producto.getCantidad());
+    }
+    
+    @Override
+    public ProductoGranel copiar() {
+        return new ProductoGranel(this);
+    }
+    
+    @Override
     public String toString() {
-        return "ProductoGranel("
-                + "clave: " + clave
-                + ", nombre: " + nombre
-                + ", tipo: " + tipo
-                + ", unidad: " + unidad
-                + ", cantidad: " + cantidad
-                + ")";
+        return "ProductoGranel["
+                + "Clave: " + getClave()
+                + ", Nombre: " + getNombre()
+                + ", Tipo: " + getTipo().toString()
+                + ", Unidad: " + getUnidad().toString()
+                + ", Cantidad: " + cantidad
+                + "]";
     }
 }

@@ -1,13 +1,14 @@
 /*
  * Genera códigos aleatorios con prefijo y formato fijo sin repeticion.
  */
-package objetosservicio;
+package objetosservicio.objetosgenerador;
 
-//** @author Julian Daniel Ramirez Garcia
-
+import objetosservicio.objetosgenerador.GeneradorCodigos;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+
+//** @author Julian Daniel Ramirez Garcia
 
 public class GeneradorCodigosAleatorios extends GeneradorCodigos {
 

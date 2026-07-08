@@ -1,53 +1,45 @@
-/*
- * Clase MovimientoEmpacado, subclase de Movimiento
+/* 
+ * 
  */
 package objetosdominio;
 
-/**
- * Representa un movimiento asociado a un producto empacado.
- * 
- * @author Julian Daniel Ramirez Garcia
- */
-public class MovimientoEmpacado extends Movimiento {
+import java.time.LocalDate;
 
-    private ProductoEmpacado producto;
+//** @author Julian Daniel Ramirez Garcia
 
-    /**
-     * Constructor por defecto
-     */
-    public MovimientoEmpacado() {
-        super();
-        this.producto = null;
+public class MovimientoEmpacado extends Movimiento<ProductoEmpacado> {
+    
+    private int cantidad;
+    
+    public MovimientoEmpacado(String clave, ProductoEmpacado producto, int cantidad) {
+        super(clave, producto);
+        if (validarCantidad(cantidad)) this.cantidad = cantidad;
     }
-
-    /**
-     * Constructor con parámetros
-     */
-    public MovimientoEmpacado(String fecha, boolean procesado, ProductoEmpacado producto) {
-        super(fecha, procesado);
-        setProducto(producto);
+    
+    public MovimientoEmpacado(String clave, ProductoEmpacado producto, LocalDate fecha, int cantidad) {
+        super(clave, producto, fecha);
+        if (validarCantidad(cantidad)) this.cantidad = cantidad;
     }
-
-    public ProductoEmpacado getProducto() {
-        return producto;
-    }
-
-    public void setProducto(ProductoEmpacado producto) {
-
-        if (producto != null) {
-            this.producto = producto;
+    
+    private boolean validarCantidad(int cantidad) {
+        if (cantidad <= -1 || cantidad >= 1) {
+            return true;
         } else {
-            System.out.println("Error Producto empacado invalido...");
+            throw new IllegalArgumentException("Can1tidad de movimiento demasiado pequeña (<-1 o >1)");
         }
     }
-
+    
+    public float getCantidad() {
+        return cantidad;
+    }
+    
     @Override
     public String toString() {
-        return "MovimientoEmpacado("
-                + "clave: " + getClave()
-                + ", fecha: " + getFecha()
-                + ", procesado: " + isProcesado()
-                + ", producto: " + producto
-                + ")";
+        return "Movimiento["
+                + "Clave: " + getClave()
+                + ", " + getProducto().toString()
+                + ", Cantidad: " + cantidad
+                + ", Fecha: " + getFecha().toString()
+                + "]";
     }
 }
